@@ -14,13 +14,8 @@
     "typeCheck": true
   },
   "ignorePatterns": [
-    ".next/**",
-    ".vinext/**",
-    "out/**",
-    "build/**",
     "dist/**",
     "coverage/**",
-    "next-env.d.ts",
     ".build/**",
     "output/**",
     ".spago/**"

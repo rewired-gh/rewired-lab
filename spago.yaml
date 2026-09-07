@@ -1,6 +1,10 @@
 package:
   name: rewired-field
   dependencies:
+    - arrays
+    - integers
+    - numbers
+    - partial
     - prelude
 workspace:
   packageSet:

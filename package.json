@@ -6,8 +6,8 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "dev": "npm run build:core && node scripts/build-surface.mjs && vite",
-    "build": "npm run build:core && node scripts/build-surface.mjs && vite build && node scripts/prerender.mjs",
+    "dev": "npm run build:core && node scripts/build-optics.mjs && vite",
+    "build": "npm run build:core && node scripts/build-optics.mjs && vite build && node scripts/prerender.mjs",
     "build:ci": "npm run setup && npm test && npm run typecheck && npm run lint && npm run build",
     "start": "vite preview --host 127.0.0.1",
     "lint": "oxlint",
@@ -15,11 +15,12 @@
     "preview": "vite preview --host 127.0.0.1",
     "typecheck": "tsc --noEmit",
     "deploy": "wrangler pages deploy dist --project-name rewired-lab-site --branch main",
-    "test": "npm run build:core && node --test scripts/surface.test.mjs",
+    "test": "npm run build:core && node --test scripts/optics.test.mjs",
     "build:core": "spago build --offline",
     "setup": "spago install"
   },
   "devDependencies": {
+    "@iconify-json/radix-icons": "^1.2.6",
     "@types/node": "22.19.19",
     "@webgpu/types": "^0.1.72",
     "oxfmt": "0.61.0",

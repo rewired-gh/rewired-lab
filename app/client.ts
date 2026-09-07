@@ -1,7 +1,6 @@
 import './globals.css';
-import { createRenderer } from '../lib/field';
+import { createOptics } from '../lib/optics';
 const canvas = document.querySelector<HTMLCanvasElement>('canvas')!;
-const fallback = document.querySelector<SVGElement>('svg')!;
 const button = document.querySelector<HTMLButtonElement>('.motion-button')!;
 const media = matchMedia('(prefers-reduced-motion: reduce)');
 let paused = media.matches;
@@ -11,31 +10,19 @@ const updateControl = () => {
     paused ? 'Resume animation' : 'Pause animation',
   );
   button.setAttribute('aria-pressed', String(paused));
-  button.querySelector('span')!.textContent = paused ? '▷' : 'Ⅱ';
+  button.querySelector('img')!.src = paused
+    ? '/icons/play.svg'
+    : '/icons/pause.svg';
 };
-// The static identity is already present; initialize its decorative enhancement
-// below input work when the browser exposes prioritized task scheduling.
-const scheduler = (
-  globalThis as typeof globalThis & {
-    scheduler?: {
-      postTask<T>(
-        task: () => Promise<T>,
-        options: { priority: 'background' },
-      ): Promise<T>;
-    };
-  }
-).scheduler;
-const initialize = () => createRenderer(canvas, paused);
-const enhancement = scheduler
-  ? scheduler.postTask(initialize, { priority: 'background' })
-  : new Promise<void>((resolve) => setTimeout(resolve, 0)).then(initialize);
+// The artwork is the primary content: initialize immediately.
+const enhancement = createOptics(canvas, paused);
 void enhancement
   .then((engine) => {
     if (!engine) return;
     canvas.classList.add('ready');
-    fallback.classList.add('hidden');
     button.hidden = false;
     engine.pause(media.matches);
+    if (import.meta.hot) import.meta.hot.dispose(() => engine.destroy());
     paused = media.matches;
     updateControl();
     button.addEventListener('click', () => {

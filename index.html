@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#0c1011" />
+    <meta name="theme-color" content="#f0ebe1" />
     <title>Rewired Lab</title>
     <meta name="description" content="Rewired Lab — rewired.ac.cn" />
     <link rel="canonical" href="https://rewired.ac.cn/" />
@@ -18,7 +18,12 @@
       <h1 aria-label="Rewired Lab">Rewired<span>Lab</span></h1>
       <div class="surface">
         <div class="surface-visual">
-          <svg viewBox="0 0 1000 1000" aria-hidden="true"><!--surface--></svg>
+          <img
+            class="poster"
+            src="/front-poster.jpg"
+            alt=""
+            fetchpriority="high"
+          />
           <canvas aria-hidden="true"></canvas>
         </div>
         <div class="surface-meta">
@@ -29,7 +34,7 @@
             aria-label="Pause animation"
             aria-pressed="false"
           >
-            <span aria-hidden="true">Ⅱ</span>
+            <img src="/icons/pause.svg" width="22" height="22" alt="" />
           </button>
         </div>
       </div>
@@ -46,32 +51,36 @@
           popovertargetaction="hide"
           aria-label="Close references"
         >
-          ×
+          <img src="/icons/close.svg" width="20" height="20" alt="" />
         </button>
       </header>
       <ol>
         <li>
-          <span class="citation-author">Matthias Weber</span
-          ><a
-            href="https://www.math.uci.edu/~vmm/Surface/Minimal_Surfaces_2011_Matthias_Weber.pdf"
-            >Classical Minimal Surfaces in Euclidean Space</a
-          ><span class="citation-context"
-            >Weierstrass representation and associate families.</span
+          <span class="citation-author">T. Pearcey · 1946</span>
+          <a href="https://doi.org/10.1080/14786444608561335"
+            >The structure of an electromagnetic field in the neighbourhood of a
+            cusp of a caustic</a
+          >
+          <span class="citation-context"
+            >Philosophical Magazine, series 7, 37(268), 311–317.</span
           >
         </li>
         <li>
           <span class="citation-author"
-            >Laurent Belcour &amp; Pascal Barla · 2017</span
-          ><a
-            href="https://belcour.github.io/blog/research/publication/2017/05/01/brdf-thin-film.html"
-            >A Practical Extension to Microfacet Theory for the Modeling of
-            Varying Iridescence</a
-          ><span class="citation-context"
-            >SIGGRAPH. Thin-film appearance; the rendering here uses a
-            simplified three-band model.</span
+            >M. V. Berry &amp; C. Upstill · 1980</span
           >
+          <a href="https://doi.org/10.1016/S0079-6638(08)70215-4"
+            >Catastrophe optics: morphologies of caustics and their diffraction
+            patterns</a
+          >
+          <span class="citation-context">Progress in Optics, 18, 257–346.</span>
         </li>
       </ol>
+      <a
+        class="source-link"
+        href="https://github.com/rewired-gh/rewired-lab/blob/main/docs/construction.md"
+        >Construction &amp; source ↗</a
+      >
     </section>
     <script type="module" src="/app/client.ts"></script>
   </body>
