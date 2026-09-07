@@ -1,44 +1,56 @@
 import shader from './front.wgsl?raw';
-import dataURL from '../.build/optics.bin?url';
-import atlas from '../.build/optics.json';
+import { createSpectralField } from './spectral';
+import { evolution } from '../output/Optics.Family/index.js';
+
+function cancellable<T>(
+  promise: Promise<T>,
+  signal: AbortSignal,
+  dispose?: (value: T) => void,
+): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const abort = () =>
+      reject(new DOMException('Initialization cancelled', 'AbortError'));
+    signal.addEventListener('abort', abort, { once: true });
+    if (signal.aborted) abort();
+    promise.then(
+      (value) => {
+        signal.removeEventListener('abort', abort);
+        if (signal.aborted) dispose?.(value);
+        else resolve(value);
+      },
+      (error) => {
+        signal.removeEventListener('abort', abort);
+        reject(error);
+      },
+    );
+  });
+}
 
 export async function createOptics(
   canvas: HTMLCanvasElement,
   initiallyPaused: boolean,
+  signal: AbortSignal,
 ) {
   canvas.dataset.renderer = 'requesting-adapter';
-  const adapter = await navigator.gpu?.requestAdapter({
-    powerPreference: 'high-performance',
-  });
+  const adapter = navigator.gpu
+    ? await cancellable(navigator.gpu.requestAdapter(), signal)
+    : null;
   if (!adapter) {
     canvas.dataset.renderer = 'unavailable';
     return null;
   }
   canvas.dataset.renderer = 'requesting-device';
-  const device = await adapter.requestDevice();
+  const device = await cancellable(adapter.requestDevice(), signal, (device) =>
+    device.destroy(),
+  );
+  const cancelDevice = () => device.destroy();
+  signal.addEventListener('abort', cancelDevice, { once: true });
   try {
     const context = canvas.getContext('webgpu');
     if (!context) {
       device.destroy();
       return null;
     }
-    canvas.dataset.renderer = 'loading-atlas';
-    const response = await fetch(dataURL);
-    if (!response.ok) throw new Error('Optical atlas unavailable');
-    const data = await response.arrayBuffer();
-    if (data.byteLength !== atlas.width * atlas.height * 8)
-      throw new Error('Optical atlas size mismatch');
-    const texture = device.createTexture({
-      size: [atlas.width, atlas.height],
-      format: 'rg32float',
-      usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
-    });
-    device.queue.writeTexture(
-      { texture },
-      data,
-      { bytesPerRow: atlas.width * 8 },
-      [atlas.width, atlas.height],
-    );
     canvas.dataset.renderer = 'compiling';
     const module = device.createShaderModule({ code: shader });
     const info = await module.getCompilationInfo();
@@ -61,6 +73,8 @@ export async function createOptics(
       size: 32,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
+    const spectral = await createSpectralField(device, uniform);
+    const texture = spectral.texture;
     const group = device.createBindGroup({
       layout: pipeline.getBindGroupLayout(0),
       entries: [
@@ -80,9 +94,18 @@ export async function createOptics(
     const values = new Float32Array(8);
     const draw = () => {
       if (destroyed || !depth) return;
-      values.set([canvas.width, canvas.height, time, 1, ...pointer, 0, 0]);
+      values.set([
+        canvas.width,
+        canvas.height,
+        time,
+        evolution(time),
+        ...pointer,
+        0,
+        0,
+      ]);
       device.queue.writeBuffer(uniform, 0, values);
       const encoder = device.createCommandEncoder();
+      spectral.encode(encoder);
       const pass = encoder.beginRenderPass({
         colorAttachments: [
           {
@@ -109,9 +132,12 @@ export async function createOptics(
     const frame = (now: number) => {
       raf = 0;
       if (destroyed || paused || document.hidden) return;
-      const dt = last ? Math.min((now - last) / 1000, 0.05) : 0;
+      const dt = last ? Math.min((now - last) / 1000, 0.25) : 0;
       last = now;
       time += dt;
+      if (Math.floor(time * 2) !== Math.floor((time - dt) * 2)) {
+        canvas.dataset.time = time.toFixed(2);
+      }
       const t = 1 - Math.exp(-dt * 2.3);
       pointer = pointer.map((p, i) => p + (target[i] - p) * t);
       draw();
@@ -175,6 +201,8 @@ export async function createOptics(
       color?.destroy();
       texture.destroy();
       uniform.destroy();
+      signal.removeEventListener('abort', cancelDevice);
+      context.unconfigure();
       device.destroy();
     };
     void device.lost.then(() => {
@@ -182,14 +210,17 @@ export async function createOptics(
         destroy();
         canvas.classList.remove('ready');
         canvas.dataset.renderer = 'device-lost';
-        const b = document.querySelector<HTMLButtonElement>('.motion-button');
-        if (b) b.hidden = true;
       }
     });
     resize();
     start();
+    if (signal.aborted) {
+      destroy();
+      return null;
+    }
     canvas.dataset.renderer = 'ready';
     return {
+      lost: device.lost,
       pause(value: boolean) {
         paused = value;
         if (paused) stop();
@@ -200,7 +231,8 @@ export async function createOptics(
   } catch (error) {
     canvas.dataset.renderer = 'failed';
     device.destroy();
-    console.error(error);
+    signal.removeEventListener('abort', cancelDevice);
+    if (!signal.aborted) console.error(error);
     return null;
   }
 }

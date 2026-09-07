@@ -1,4 +1,4 @@
-module Optics.Cusp (Complex, complex, fft, aperture, phase, pupil, caustic, front) where
+module Optics.Family (Complex, complex, fft, phase, pupil, front, evolution) where
 
 import Prelude
 import Data.Array (length, range, unsafeIndex)
@@ -21,7 +21,7 @@ complex :: Number -> Number -> Complex
 complex re im = Complex { re, im }
 
 -- Positive-sign, unnormalised DFT. Requires a positive power-of-two length;
--- production uses 8192. Each radix-2 stage is a pure map without aliased writes.
+-- production uses 2048. Each radix-2 stage is a pure map without aliased writes.
 fft :: Array Complex -> Array Complex
 fft input =
   let
@@ -49,36 +49,32 @@ fft input =
         in stage (width * 2) (map butterfly ids)
   in stage 2 initial
 
--- A smooth finite aperture, explicitly part of the model. This is not the
--- unwindowed canonical Pearcey integral over the whole real line.
-aperture :: Number -> Number
-aperture t =
-  let
-    q = t / 2.0
-    q2 = q * q
-    q4 = q2 * q2
-  in exp (negate (q4 * q4))
-
-phase :: Number -> Number -> Number -> Number
-phase a b t = t * t * t * t / 4.0 + a * t * t / 2.0 + b * t
+-- A symmetric three-control slice of the degree-six cuspoid family.
+phase :: Number -> Number -> Number -> Number -> Number
+phase mu a b t =
+  let t2 = t * t
+  in t2 * t2 * t2 / 6.0 + mu * t2 * t2 / 4.0 + a * t2 / 2.0 + b * t
 
 pupil :: Number -> Number -> Number -> Complex
-pupil frequency a t =
+pupil mu a t =
   let
-    p = frequency * phase a 0.0 t
-    w = aperture t
+    p = 30.0 * phase mu a 0.0 t
+    q = t / 1.3
+    q2 = q * q
+    q4 = q2 * q2
+    w = exp (negate (q4 * q4))
   in complex (w * cos p) (w * sin p)
 
--- Simultaneous vanishing of the first two t-derivatives of phase.
-caustic :: Number -> { a :: Number, b :: Number }
-caustic t = { a: -3.0 * t * t, b: 2.0 * t * t * t }
+front :: Number -> Number -> Number -> { b :: Number, value :: Number, pa :: Number, pb :: Number, pmu :: Number }
+front mu a t =
+  let t2 = t * t
+  in
+    { b: negate (t2 * t2 * t + mu * t2 * t + a * t)
+    , value: -5.0 * t2 * t2 * t2 / 6.0 - 0.75 * mu * t2 * t2 - 0.5 * a * t2
+    , pa: t2 / 2.0
+    , pb: t
+    , pmu: t2 * t2 / 4.0
+    }
 
--- The critical-value front, with contact momenta in the same coordinates.
-front :: Number -> Number -> { a :: Number, b :: Number, value :: Number, pa :: Number, pb :: Number }
-front a t =
-  { a
-  , b: negate (t * t * t + a * t)
-  , value: -0.75 * t * t * t * t - 0.5 * a * t * t
-  , pa: t * t / 2.0
-  , pb: t
-  }
+evolution :: Number -> Number
+evolution time = -0.5 + 1.3 * sin (time * 0.35)

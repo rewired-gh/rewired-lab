@@ -2,7 +2,7 @@
 
 Source for [rewired.ac.cn](https://rewired.ac.cn).
 
-A quiet identity page with an interactive optical front. Its geometry and finite-aperture diffraction field share one quartic generating function. The implementation uses PureScript for the mathematical core and Fourier transform, TypeScript for browser effects, and native WebGPU/WGSL for rendering.
+A quiet identity page with an interactive optical front. Its evolving geometry and live finite-aperture diffraction field share one generating family. The implementation uses PureScript for the mathematical core and Fourier transform, TypeScript for browser effects, and native WebGPU/WGSL for both Fourier computation and rendering.
 
 ## Development
 
@@ -30,4 +30,4 @@ Cloudflare Pages project **rewired-lab-site** connects directly to this reposito
 
 A failing build does not replace the last successful deployment. The application module carries `data-cfasync="false"` because the custom domain has Cloudflare Rocket Loader enabled.
 
-Credentials, local caches, and generated numerical assets are excluded from Git. Dependencies are pinned in `package-lock.json` and `spago.lock`.
+Credentials and local caches are excluded from Git. Dependencies are pinned in `package-lock.json` and `spago.lock`.

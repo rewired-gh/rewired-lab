@@ -6,8 +6,8 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "dev": "npm run build:core && node scripts/build-optics.mjs && vite",
-    "build": "npm run build:core && node scripts/build-optics.mjs && vite build && node scripts/prerender.mjs",
+    "dev": "npm run build:core && vite",
+    "build": "npm run build:core && vite build && node scripts/prerender.mjs",
     "build:ci": "npm run setup && npm test && npm run build && npm run typecheck && npm run lint",
     "start": "vite preview --host 127.0.0.1",
     "lint": "oxlint",

@@ -1,117 +1,132 @@
-# Construction
+# Construction and verification
 
-The composition joins two views of the same generating family. It is an artistic
-rendering of established mathematics, not a claim of a new physical effect.
+This is an evolving computational composition. It implements established
+singularity theory and finite-aperture scalar diffraction. It does **not** claim
+a new theorem, a new wave-optics method, or research-frontier performance.
 
-## Generating family and front
+## One family, two representations
 
-Let
-
-\[
-S(t;a,b)=\frac{t^4}{4}+\frac{a t^2}{2}+bt.
-\]
-
-Stationarity in the internal variable gives \(t^3+at+b=0\). Parameterizing this
-critical set by \((a,t)\) yields
+The generating family is
 
 \[
-b=-t^3-at,\qquad s=S|_{S_t=0}=-\frac34t^4-\frac12at^2.
+S(t;\mu,a,b)=t^6/6+\mu t^4/4+a t^2/2+bt.
 \]
 
-Before scaling and rotation, two triangular shears set the composition:
-\(A=a+0.22b^2\), \(B=b+0.035A^2\). Their composition is invertible with
-Jacobian determinant one. The displayed front uses \((A,B,s)\); its normals
-include the chain rule for this coordinate change. The contact calculation
-below is in the original \((a,b)\) chart.
+It is a three-control slice of the degree-six cuspoid family, with its cubic
+coefficient fixed at zero. It is not a full miniversal unfolding. The cycle
+\(\mu(\tau)=-0.5+1.3\sin(0.35\tau)\) changes the generating family, not just the
+camera. This parameter path is an artistic choice, not a physical time-evolution
+law for an electromagnetic field.
 
-The front is not an
-embedded smooth surface everywhere. Its cuspidal edges occur when
-\(a+3t^2=0\). Their projection into the control plane is
-\((a,b)=(-3t^2,2t^3)\), satisfying \(4a^3+27b^2=0\).
-
-In the first jet space of the control plane, augment the front with
-\(p_a=t^2/2\) and \(p_b=t\). Direct differentiation gives
+Stationarity gives \(t^5+\mu t^3+at+b=0\). The rendered critical-value front is
+parameterized by \((a,t)\):
 
 \[
-ds=p_a\,da+p_b\,db.
+b=-t^5-\mu t^3-at,\qquad
+s=-5t^6/6-3\mu t^4/4-at^2/2.
 \]
 
-Thus the pullback of the contact form \(ds-p_a da-p_b db\) vanishes. The lift is
-regular even where its front projection is singular: its \(a\) and \(p_b\)
-coordinates are the independent parameters. Forgetting \(s\) gives an exact
-Lagrangian immersion. These identities are algebraic; the finite-difference
-tests provide a separate check of their implementation, not their proof.
+The caustic in the control plane has
+\(a=-5t^4-3\mu t^2\), \(b=4t^5+2\mu t^3\).
+Its cusp candidates satisfy \(t(10t^2+3\mu)=0\): three real candidates when
+\(\mu<0\), one when \(\mu>0\), and a higher degeneracy at zero.
+This provides an observable change in singular structure during the cycle.
 
-## Wave field
+## Contact identity
 
-The scalar field used in the surface appearance is
+Set \(p_a=t^2/2\), \(p_b=t\), and \(p_\mu=t^4/4\).
+On the critical set, the chain rule and \(S_t=0\) give exactly
 
 \[
-U(a,b)=\int_{-3.5}^{3.5}
-\exp[-(t/2)^8]\exp[90iS(t;a,b)]\,dt.
+ds=p_a\,da+p_b\,db+p_\mu\,d\mu.
 \]
 
-The smooth finite aperture is part of this model. **This is not the unwindowed
-canonical Pearcey integral.** The pupil amplitude at either integration endpoint
-is below \(10^{-35}\). A positive-sign, unnormalised radix-2 Fourier transform
-evaluates the sampled integral across the linear control parameter \(b\).
-The phase associated with the shifted sampling origin and the integration step
-are both included. PureScript represents complex numbers as a ring and implements
-each butterfly stage as a pure array transformation.
+For fixed \(\mu\), the lift into the first jet space is Legendrian. It is regular
+because \((a,p_b)=(a,t)\) supplies independent coordinates, even where its front
+projection is singular. Forgetting \(s\) yields an exact Lagrangian immersion.
+The numerical tests check the implementation against this algebraic derivation;
+they are not a proof by sampling.
 
-The build samples 8,192 pupil points per row and creates a 768 × 1,024 complex
-atlas. The control interval is \(-4.4\le a\le1.2\); the frequency spacing is
-\(\Delta b=\pi/(3.5\cdot90)\). GPU sampling uses bilinear interpolation of
-32-bit complex amplitudes. This adds interpolation and quantization errors beyond
-the quadrature error tested below. The atlas is a rendering resource, not a
-certified numerical table for arbitrary scientific calculations.
+Two invertible triangular chart shears, \(A=a+0.22b^2\) and
+\(B=b+0.035A^2\), set the composition. Their Jacobian determinant is one.
+The displayed coordinates are scaled and rotated \((A,B,s)\). Shader normals
+include the chart derivatives and use the limiting tangent plane obtained by
+factoring the vanishing derivative at a cuspidal edge.
 
-## Rendering choices
+## Live wave calculation
 
-WebGPU generates the front procedurally from its parameter grid and uses depth
-testing and four-sample multisampling. At a cuspidal edge the front's parameter
-derivative degenerates; the shader uses the limiting tangent plane after factoring
-out the vanishing scalar. The lighting does not assert smoothness across the front
-singularity.
+Every rendered frame computes
 
-Fine lines are level sets of the linear parameter coordinate \(900t+90a\). Their derivative-based filter,
-studio shading, highlighted folds, graphite palette, chromatic accents, and edge
-fade are artistic transfer functions. They are not a spectral simulation,
-measured material, physically computed shadow, or a photograph of an optical
-experiment. The finite-aperture intensity modulates the appearance within the
-atlas domain. Pointer movement changes the observer's view; the slow camera drift
-can be paused. No claim of a changing physical wave solution is attached to the
-camera motion.
+\[
+U(\mu,a,b)=\int_{-2.4}^{2.4}
+e^{-(t/1.3)^8}e^{30iS(t;\mu,a,b)}\,dt.
+\]
 
-The loading poster is a browser capture of this renderer. Devices without
-WebGPU retain that frame. The poster is a raster asset, not an alternative
-mathematical construction.
+The finite smooth aperture is part of the model. This is not the unwindowed
+canonical integral. A WebGPU compute workgroup evaluates each row with a
+2,048-point positive-sign radix-2 FFT. Each workgroup uses 256 lanes and 16 KiB of
+shared storage. Disjoint butterflies and a barrier between stages prevent
+cross-stage read/write races. Both the integration step and the phase from the
+shifted sampling origin are included.
 
-## Checks and ablation
+The output is a 256 × 128 complex `rg32float` texture, recomputed before the
+surface draw in the same command encoder. Geometry and diffraction use the same
+uniform parameter. There is no downloaded or precomputed wave atlas.
+The sampled interval is \(-4\le a\le3\), with
+\(b_k=k\pi/(2.4\cdot30)\), \(-128\le k<128\).
 
-The tests compare the pure FFT with an independently written direct DFT, check
-Parseval's identity, double the quadrature resolution across the production
-frequency range, check the pupil against its explicit definition, and verify
-stationarity, the caustic discriminant, and the contact identity.
+Intensity modulates the surface inside the atlas domain. Fine engraved lines
+are a separate artistic coordinate foliation, not diffraction fringes. Their
+six-harmonic Fourier expansion is filtered with a Gaussian pixel-footprint
+approximation. Studio lighting, fold highlights, edge fading, and color mapping
+are artistic transfer functions, not measured optical material properties.
+The surface is not a physically fabricated object.
 
-At the tested control rows, doubling the pupil sample count from 4,096 to 8,192
-changes complex amplitudes by less than \(10^{-10}\), the asserted tolerance.
-This does not bound GPU interpolation error or establish convergence everywhere.
+## Reproducible checks
 
-Visual exploration compared a flat intensity field, a field with a coherent
-reference wave, and the critical-value front. The flat views made the cusp readable
-but produced a diagram-like composition. The front was retained for its depth and
-layer separation. The reference-wave experiment was discarded; it is not part of
-the deployed model. This was a design comparison, not a controlled audience study.
+Run `npm run build:ci` for the CPU checks and production build.
+For the independent GPU comparison, run `npm run dev`, then open
+`/scripts/validate-gpu.html`. This developer page is not a production build entry.
+It reads the computed texture back and compares complex amplitudes with the
+separate PureScript FFT implementation.
 
-## Sources
+The CPU suite checks direct-DFT agreement, Parseval's identity, the extended
+contact identity, the cusp regimes, and quadrature convergence when doubling
+2,048 to 4,096 samples at twelve parameter combinations across the rendered range.
+The asserted quadrature tolerance is \(10^{-9}\).
 
-1. T. Pearcey (1946), “The structure of an electromagnetic field in the neighbourhood
-   of a cusp of a caustic,” _Philosophical Magazine_, series 7, **37**(268), 311–317.
-   [doi:10.1080/14786444608561335](https://doi.org/10.1080/14786444608561335).
-2. M. V. Berry and C. Upstill (1980), “Catastrophe optics: morphologies of caustics
+The GPU check covers 5,120 complex values at four values of \(\mu\) and five
+control rows, including the range boundaries. On the development browser GPU,
+the maximum absolute complex-amplitude discrepancy was
+\(1.31\times10^{-6}\), below the preset \(2\times10^{-4}\) tolerance.
+This is a measured sample result, not a uniform bound across devices or controls.
+Texture interpolation and the finite surface mesh add errors not bounded by that
+comparison. No scientific reference-table accuracy is claimed.
+
+Motion verification compares separated rendered frames and checks that pause
+holds the frame. Reduced-motion preferences start the renderer paused. If GPU
+initialization stalls, the page offers a Start animation control to retry; a
+captured frame remains visible. Leaving the page releases the GPU device.
+
+## Research context and limits
+
+The previous composition used a fixed quartic front, a precomputed atlas and
+barely perceptible camera drift. Those choices did not satisfy visible dynamism.
+The new version changes the singular structure and recalculates the wave field.
+This is an implementation improvement, not evidence of a research contribution.
+
+Contemporary work such as Zeng et al., _Designing and Fabricating Color BRDFs with
+Differentiable Wave Optics_ (SIGGRAPH Asia 2025), couples optical simulation,
+optimization, and physical fabrication validation. This website does not
+reproduce that work or claim comparable scope. See the
+[authors' project](https://vclab.kaist.ac.kr/siggraphasia2025p1/index.html).
+A genuine research claim would need a specific unsolved problem, a new result,
+reproducible baselines, and evidence beyond an attractive rendering.
+
+## Mathematical references
+
+1. M. V. Berry and C. Upstill (1980), “Catastrophe optics: morphologies of caustics
    and their diffraction patterns,” _Progress in Optics_, **18**, 257–346.
-   [doi:10.1016/S0079-6638(08)70215-4](<https://doi.org/10.1016/S0079-6638(08)70215-4>).
-
-Canonical-integral conventions can also be checked against the
-[NIST Digital Library of Mathematical Functions, §36.2](https://dlmf.nist.gov/36.2).
+   [DOI](<https://doi.org/10.1016/S0079-6638(08)70215-4>).
+2. NIST Digital Library of Mathematical Functions, §36.2,
+   [“Catastrophes and Canonical Integrals”](https://dlmf.nist.gov/36.2).
