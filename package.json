@@ -1,0 +1,38 @@
+{
+  "name": "rewired-lab",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "npm run build:core && node scripts/build-surface.mjs && vite",
+    "build": "npm run build:core && node scripts/build-surface.mjs && vite build && node scripts/prerender.mjs",
+    "build:ci": "npm run setup && npm test && npm run typecheck && npm run lint && npm run build",
+    "start": "vite preview --host 127.0.0.1",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "preview": "vite preview --host 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "deploy": "wrangler pages deploy dist --project-name rewired-lab-site --branch main",
+    "test": "npm run build:core && node --test scripts/surface.test.mjs",
+    "build:core": "spago build --offline",
+    "setup": "spago install"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.19",
+    "@webgpu/types": "^0.1.72",
+    "oxfmt": "0.61.0",
+    "oxlint": "1.76.0",
+    "oxlint-tsgolint": "7.0.2001",
+    "purescript": "0.15.16",
+    "spago": "1.0.4",
+    "typescript": "5.9.3",
+    "vite": "8.2.2",
+    "wrangler": "4.129.0"
+  },
+  "type": "module",
+  "overrides": {
+    "tar": "7.5.22"
+  }
+}

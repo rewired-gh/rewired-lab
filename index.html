@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0c1011" />
+    <title>Rewired Lab</title>
+    <meta name="description" content="Rewired Lab — rewired.ac.cn" />
+    <link rel="canonical" href="https://rewired.ac.cn/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:title" content="Rewired Lab" />
+    <meta property="og:description" content="Rewired Lab — rewired.ac.cn" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://rewired.ac.cn/" />
+  </head>
+  <body>
+    <main id="main" class="page-shell">
+      <h1 aria-label="Rewired Lab">Rewired<span>Lab</span></h1>
+      <div class="surface">
+        <div class="surface-visual">
+          <svg viewBox="0 0 1000 1000" aria-hidden="true"><!--surface--></svg>
+          <canvas aria-hidden="true"></canvas>
+        </div>
+        <div class="surface-meta">
+          <button
+            type="button"
+            class="motion-button"
+            hidden
+            aria-label="Pause animation"
+            aria-pressed="false"
+          >
+            <span aria-hidden="true">Ⅱ</span>
+          </button>
+        </div>
+      </div>
+    </main>
+    <button type="button" class="references-trigger" popovertarget="references">
+      References
+    </button>
+    <section id="references" popover aria-labelledby="references-title">
+      <header>
+        <h2 id="references-title">References</h2>
+        <button
+          type="button"
+          popovertarget="references"
+          popovertargetaction="hide"
+          aria-label="Close references"
+        >
+          ×
+        </button>
+      </header>
+      <ol>
+        <li>
+          <span class="citation-author">Matthias Weber</span
+          ><a
+            href="https://www.math.uci.edu/~vmm/Surface/Minimal_Surfaces_2011_Matthias_Weber.pdf"
+            >Classical Minimal Surfaces in Euclidean Space</a
+          ><span class="citation-context"
+            >Weierstrass representation and associate families.</span
+          >
+        </li>
+        <li>
+          <span class="citation-author"
+            >Laurent Belcour &amp; Pascal Barla · 2017</span
+          ><a
+            href="https://belcour.github.io/blog/research/publication/2017/05/01/brdf-thin-film.html"
+            >A Practical Extension to Microfacet Theory for the Modeling of
+            Varying Iridescence</a
+          ><span class="citation-context"
+            >SIGGRAPH. Thin-film appearance; the rendering here uses a
+            simplified three-band model.</span
+          >
+        </li>
+      </ol>
+    </section>
+    <script type="module" src="/app/client.ts"></script>
+  </body>
+</html>

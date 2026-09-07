@@ -1,0 +1,241 @@
+[hidden] {
+  display: none !important;
+}
+:root {
+  color-scheme: dark;
+  --foreground: #e8e6df;
+  --background: #0c1011;
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  font-size: 16px;
+}
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+}
+button {
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+:focus-visible {
+  outline: 2px solid #d2ba90;
+  outline-offset: 5px;
+}
+.page-shell {
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  overflow: hidden;
+  background: radial-gradient(
+    ellipse at 50% 43%,
+    #262a27 0%,
+    #151b1c 39%,
+    #0b1012 76%
+  );
+}
+h1 {
+  position: absolute;
+  z-index: 2;
+  left: 6.8vw;
+  bottom: 12svh;
+  margin: 0;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(64px, 9.5vw, 150px);
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.07em;
+  pointer-events: none;
+}
+h1 span {
+  margin-left: 0.19em;
+}
+.surface {
+  position: absolute;
+  inset: 0;
+}
+.surface-visual {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 86svh;
+}
+.surface canvas,
+.surface svg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+}
+.surface canvas {
+  opacity: 0;
+  transition: opacity 0.8s;
+}
+.surface canvas.ready {
+  opacity: 1;
+}
+.surface svg.hidden {
+  visibility: hidden;
+}
+.surface-meta {
+  position: fixed;
+  right: 4vw;
+  bottom: 3vw;
+  z-index: 3;
+  min-height: 44px;
+}
+.motion-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid #535d5850;
+  border-radius: 50%;
+  background: transparent;
+  color: #a4aaa5;
+  cursor: pointer;
+  font:
+    15px Arial,
+    sans-serif;
+  transition: background 0.2s;
+}
+.motion-button:hover,
+.motion-button:focus-visible {
+  background: #ffffff10;
+}
+@media (max-width: 760px) {
+  h1 {
+    left: 8vw;
+    bottom: 18svh;
+    font-size: clamp(48px, 12vw, 88px);
+  }
+  .surface-visual {
+    height: 82svh;
+  }
+  .surface-meta {
+    right: 5vw;
+    bottom: 4vw;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+  }
+}
+.references-trigger {
+  position: fixed;
+  left: 7vw;
+  bottom: 3vw;
+  z-index: 3;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #a4aaa5;
+  font:
+    12px/1.5 Arial,
+    sans-serif;
+  cursor: pointer;
+}
+#references {
+  position: fixed;
+  inset: auto auto max(76px, 8vw) 7vw;
+  width: min(420px, 86vw);
+  max-height: 75svh;
+  overflow: auto;
+  margin: 0;
+  padding: 28px;
+  border: 1px solid #3e4644;
+  background: #151a1b;
+  color: var(--foreground);
+  box-shadow: 0 12px 64px #00000050;
+  opacity: 0;
+  translate: 0 6px;
+  transition:
+    opacity 0.2s,
+    translate 0.2s,
+    display 0.2s allow-discrete,
+    overlay 0.2s allow-discrete;
+}
+#references:popover-open {
+  opacity: 1;
+  translate: 0 0;
+}
+@starting-style {
+  #references:popover-open {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+#references header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+#references h2 {
+  font:
+    24px/1.2 Georgia,
+    serif;
+  font-weight: 400;
+  margin: 0;
+  letter-spacing: -0.03em;
+}
+#references button {
+  width: 44px;
+  height: 44px;
+  margin: -12px -12px -12px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 22px;
+  cursor: pointer;
+}
+#references ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+#references li + li {
+  margin-top: 26px;
+}
+#references a {
+  display: block;
+  margin: 7px 0;
+  color: inherit;
+  text-decoration-color: #778683;
+  text-underline-offset: 3px;
+  font:
+    17px/1.4 Georgia,
+    serif;
+}
+#references a:hover {
+  text-decoration-color: currentColor;
+}
+.citation-author,
+.citation-context {
+  display: block;
+  font:
+    11px/1.6 Arial,
+    sans-serif;
+  color: #a4aaa5;
+}
+@media (max-width: 760px) {
+  .references-trigger {
+    left: 9vw;
+    bottom: 4vw;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #references {
+    transition: none;
+  }
+}

@@ -1,0 +1,7 @@
+package:
+  name: rewired-field
+  dependencies:
+    - prelude
+workspace:
+  packageSet:
+    registry: 80.8.1
