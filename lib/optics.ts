@@ -6,10 +6,15 @@ export async function createOptics(
   canvas: HTMLCanvasElement,
   initiallyPaused: boolean,
 ) {
+  canvas.dataset.renderer = 'requesting-adapter';
   const adapter = await navigator.gpu?.requestAdapter({
     powerPreference: 'high-performance',
   });
-  if (!adapter) return null;
+  if (!adapter) {
+    canvas.dataset.renderer = 'unavailable';
+    return null;
+  }
+  canvas.dataset.renderer = 'requesting-device';
   const device = await adapter.requestDevice();
   try {
     const context = canvas.getContext('webgpu');
@@ -17,6 +22,7 @@ export async function createOptics(
       device.destroy();
       return null;
     }
+    canvas.dataset.renderer = 'loading-atlas';
     const response = await fetch(dataURL);
     if (!response.ok) throw new Error('Optical atlas unavailable');
     const data = await response.arrayBuffer();
@@ -33,6 +39,7 @@ export async function createOptics(
       { bytesPerRow: atlas.width * 8 },
       [atlas.width, atlas.height],
     );
+    canvas.dataset.renderer = 'compiling';
     const module = device.createShaderModule({ code: shader });
     const info = await module.getCompilationInfo();
     const errors = info.messages.filter((m) => m.type === 'error');
@@ -174,12 +181,14 @@ export async function createOptics(
       if (!destroyed) {
         destroy();
         canvas.classList.remove('ready');
+        canvas.dataset.renderer = 'device-lost';
         const b = document.querySelector<HTMLButtonElement>('.motion-button');
         if (b) b.hidden = true;
       }
     });
     resize();
     start();
+    canvas.dataset.renderer = 'ready';
     return {
       pause(value: boolean) {
         paused = value;
@@ -189,6 +198,7 @@ export async function createOptics(
       destroy,
     };
   } catch (error) {
+    canvas.dataset.renderer = 'failed';
     device.destroy();
     console.error(error);
     return null;

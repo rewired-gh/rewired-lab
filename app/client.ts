@@ -38,6 +38,7 @@ void enhancement
     window.addEventListener('pagehide', () => engine.pause(true));
     window.addEventListener('pageshow', () => engine.pause(paused));
   })
-  .catch(() => {
-    /* Keep the prerendered field when a rendering API is unavailable. */
+  .catch((error) => {
+    canvas.dataset.renderer = 'failed';
+    console.error('Optical renderer initialization failed', error);
   });
